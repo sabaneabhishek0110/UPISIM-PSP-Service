@@ -7,7 +7,7 @@ This models the complete transaction lifecycle, including request validation, ro
 ## 🏗️ High-Level Architecture
 ![High-Level Design of UPIFlow](High-Level-Design-UPI.png)
 
-UPIFlow is designed around four core logical entities communicating securely to process a transaction lifecycle:
+UPIGrid is designed around four core logical entities communicating securely to process a transaction lifecycle:
 
 * **PSP Service (Payment Service Provider):** The user-facing gateway. It authenticates the user, validates balances, and initiates the payment request.
 * **NPCI Switch (Central Router):** The central brain of the ecosystem. It receives requests from the PSP, validates the destination, and securely routes the transaction to the appropriate banks.
