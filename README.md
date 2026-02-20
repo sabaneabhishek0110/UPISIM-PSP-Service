@@ -1,6 +1,8 @@
 # 🚀 UPIGrid – Distributed UPI Payment Processing System
 
-A production-grade, fault-tolerant payment processing system built using a Spring Boot microservices architecture. UPIFlow simulates the real-world digital payment ecosystem, replicating how transactions route between Payment Service Providers (PSPs), the central NPCI switch, and beneficiary banks with strict ACID guarantees.
+UPIGrid is a microservices-based system that simulates how UPI transactions flow between Payment Service Providers (PSPs), the central switch operated by NPCI, and beneficiary banks within the UPI ecosystem.
+
+This models the complete transaction lifecycle, including request validation, routing through a central switch, debit and credit processing, and response propagation across independent services while maintaining consistent transaction states.
 
 ## 🏗️ High-Level Architecture
 ![High-Level Design of UPIFlow](High-Level-Design-UPI.png)
