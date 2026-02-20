@@ -33,7 +33,6 @@ The system is broken down into independent, modular services with strict separat
 | **Bank-B Service** | Manages debit/credit processing and ledger management. | [View Repo](https://github.com/sabaneabhishek0110/UPISIM-Bank-B-Service) |
 | **Frontend** | React-based user interface for transaction initiation. | [View Repo](https://github.com/sabaneabhishek0110/UPISIM-Frontend) |
 
-*(Note: Update the `#` links in the repository column with your actual GitHub URLs before committing).*
 
 ---
 
