@@ -15,5 +15,6 @@ public class PaymentRequest {
     private String payeeVpa;
     private Double amount;
     private String pin;
-    private String psp_txn_id;
+    private String pspTxnId;
+    private String callbackUrl;
 }

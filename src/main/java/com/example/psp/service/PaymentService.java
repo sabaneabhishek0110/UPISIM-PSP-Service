@@ -3,52 +3,63 @@ package com.example.psp.service;
 import com.example.psp.Repository.PspTransactionsRepository;
 import com.example.psp.Repository.UserRepository;
 import com.example.psp.Repository.VpaAccountsRepository;
+import com.example.psp.dto.CallbackRequest;
 import com.example.psp.dto.PaymentRequest;
 import com.example.psp.dto.PaymentResponse;
 import com.example.psp.model.PSP_TRANSACTIONS;
 import com.example.psp.model.User;
 import com.example.psp.model.VPA_ACCOUNT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServlet;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.io.IOException;
 
 
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
     private final UserRepository userRepository;
     private final PspTransactionsRepository pspTransactionsRepository;
     private final PSPService pspService;
     private final ObjectMapper objectMapper;
     private final VpaAccountsRepository vpaAccountsRepository;
-    public PaymentService(UserRepository userRepository,
-                          PspTransactionsRepository pspTransactionsRepository,
-                          PSPService pspService,
-                          ObjectMapper objectMapper,
-                          VpaAccountsRepository vpaAccountsRepository) {
-        this.userRepository = userRepository;
-        this.pspTransactionsRepository = pspTransactionsRepository;
-        this.pspService = pspService;
-        this.objectMapper = objectMapper;
-        this.vpaAccountsRepository = vpaAccountsRepository;
+
+    @Value("${url.psp_url}")
+    private String PSP_URL;
+
+    @Transactional
+    public void updateTransactionFromCallback(
+            CallbackRequest request) {
+
+        PSP_TRANSACTIONS txn =
+                pspTransactionsRepository.findById(UUID.fromString(request.getPspTxnId()))
+                        .orElseThrow();
+
+        if(txn.getStatus().equals("SUCCESS")) {
+            return; // idempotent
+        }
+
+        txn.setStatus(PSP_TRANSACTIONS.TransactionStatus.valueOf(request.getStatus()));
+        txn.setUpdatedAt(LocalDateTime.now());
+
+        pspTransactionsRepository.save(txn);
     }
 
     public HttpEntity<PaymentRequest> createPaymentRequest(String PayerVpa,String PayeeVpa, Double amount,String pin,String psp_txn_id){
         try{
-
-            PaymentRequest paymentRequest = new PaymentRequest(PayerVpa,PayeeVpa,amount,pin,psp_txn_id);
+            String callbackUrl = PSP_URL + "/api/payment/callback";
+            PaymentRequest paymentRequest = new PaymentRequest(PayerVpa,PayeeVpa,amount,pin,psp_txn_id,callbackUrl);
 
             HttpHeaders headers = new HttpHeaders();
 
@@ -71,47 +82,47 @@ public class PaymentService {
         transaction.setPayee_vpa(payeeVpa);
         transaction.setAmount(amount);
         transaction.setMessage(message);
-        transaction.setUpi_txn_id(null);
+        transaction.setUpiTxnId(null);
         transaction.setRrn(null);
         pspTransactionsRepository.save(transaction);
         return transaction.getId().toString();
     }
 
     public void handlePaymentResponse(PaymentResponse response) {
-        UUID psp_txn_id = UUID.fromString(response.getPsp_txn_id());
+        UUID psp_txn_id = UUID.fromString(response.getPspTxnId());
         PSP_TRANSACTIONS transaction = pspTransactionsRepository.findById(psp_txn_id).get();
         if(response.getResponse_code().equals("U03")){
             transaction.setStatus(PSP_TRANSACTIONS.TransactionStatus.FAILED);
             transaction.setFailure_reason("Account Not Found");
-            transaction.setUpi_txn_id(response.getUpi_txn_id());
+            transaction.setUpiTxnId(response.getUpiTxnId());
             transaction.setRrn(null);
             pspTransactionsRepository.save(transaction);
         }
         else if(response.getResponse_code().equals("U02")){
             transaction.setStatus(PSP_TRANSACTIONS.TransactionStatus.FAILED);
             transaction.setFailure_reason("Account is Inactive");
-            transaction.setUpi_txn_id(response.getUpi_txn_id());
+            transaction.setUpiTxnId(response.getUpiTxnId());
             transaction.setRrn(null);
             pspTransactionsRepository.save(transaction);
         }
         else if(response.getResponse_code().equals("U01")){
             transaction.setStatus(PSP_TRANSACTIONS.TransactionStatus.FAILED);
             transaction.setFailure_reason("Wrong Pin Entered");
-            transaction.setUpi_txn_id(response.getUpi_txn_id());
+            transaction.setUpiTxnId(response.getUpiTxnId());
             transaction.setRrn(null);
             pspTransactionsRepository.save(transaction);
         }
         else if(response.getResponse_code().equals("U14")){
             transaction.setStatus(PSP_TRANSACTIONS.TransactionStatus.FAILED);
             transaction.setFailure_reason("Balance is Insufficient");
-            transaction.setUpi_txn_id(response.getUpi_txn_id());
+            transaction.setUpiTxnId(response.getUpiTxnId());
             transaction.setRrn(null);
             pspTransactionsRepository.save(transaction);
         }
         else{
             transaction.setStatus(PSP_TRANSACTIONS.TransactionStatus.SUCCESS);
             transaction.setFailure_reason(null);
-            transaction.setUpi_txn_id(response.getUpi_txn_id());
+            transaction.setUpiTxnId(response.getUpiTxnId());
             transaction.setRrn(response.getRrn());
             pspTransactionsRepository.save(transaction);
         }

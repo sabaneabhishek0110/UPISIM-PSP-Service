@@ -72,23 +72,23 @@ public class PspUserController {
         try{
             User user = pspService.authenticateUser(req.getPhone(),req.getPassword());
             String token = tokenService.issueToken(user.getId().toString());
-//            ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME,token)
-//                    .httpOnly(true)
-//                    .secure(false)
-//                    .sameSite("Lax")
-//                    .path("/")
-//                    .maxAge(7*24*60*60)
-//                    .build();
+            ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME,token)
+                    .httpOnly(true)
+                    .secure(false)
+                    .sameSite("Lax")
+                    .path("/")
+                    .maxAge(7*24*60*60)
+                    .build();
 
 
             //for production
-            ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, token)
-                    .httpOnly(true)
-                    .secure(true)              // MUST be true in HTTPS
-                    .sameSite("None")          // MUST be None for cross-site
-                    .path("/")
-                    .maxAge(7 * 24 * 60 * 60)
-                    .build();
+//            ResponseCookie cookie = ResponseCookie.from(COOKIE_NAME, token)
+//                    .httpOnly(true)
+//                    .secure(true)              // MUST be true in HTTPS
+//                    .sameSite("None")          // MUST be None for cross-site
+//                    .path("/")
+//                    .maxAge(7 * 24 * 60 * 60)
+//                    .build();
 
             VPA_ACCOUNT vpa_account = pspService.getVpaAccountByUser(user);
             UserDTO response = new UserDTO(

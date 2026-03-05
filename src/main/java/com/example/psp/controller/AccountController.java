@@ -1,10 +1,12 @@
 package com.example.psp.controller;
 
+import com.example.psp.Repository.PspTransactionsRepository;
 import com.example.psp.dto.*;
 import com.example.psp.model.PSP_TRANSACTIONS;
 import com.example.psp.service.PSPService;
 import com.example.psp.service.PaymentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
@@ -20,21 +22,17 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/account")
+@RequiredArgsConstructor
 public class AccountController {
     private final PSPService pspService;
     private final PaymentService paymentService;
     private final ObjectMapper objectMapper;
     private RestTemplate restTemplate;
+    private PspTransactionsRepository pspTxnRepo;
 
     @Value("${url.npci_url}")
     private String NPCI_URL;
 
-    public  AccountController(PSPService pspService,ObjectMapper objectMapper,RestTemplate restTemplate,PaymentService paymentService) {
-        this.pspService = pspService;
-        this.paymentService = paymentService;
-        this.objectMapper = objectMapper;
-        this.restTemplate = restTemplate;
-    }
 
     @PostMapping("/balance")
     public ResponseEntity<?> checkBalance(@RequestBody BalanceRequestToPsp requestBody){
@@ -127,5 +125,16 @@ public class AccountController {
             return ResponseEntity.internalServerError().body("Failed to fetch transaction details");
         }
 
+    }
+
+    @GetMapping("/transaction/status/{pspTxnId}")
+    public ResponseEntity<?> checkStatus(
+            @PathVariable String pspTxnId) {
+
+        PSP_TRANSACTIONS txn =
+                pspTxnRepo.findById(UUID.fromString(pspTxnId))
+                        .orElseThrow();
+
+        return ResponseEntity.ok(txn);
     }
 }

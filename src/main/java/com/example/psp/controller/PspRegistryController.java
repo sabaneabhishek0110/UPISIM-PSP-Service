@@ -31,7 +31,7 @@ public class PspRegistryController {
     @PostMapping("/register-public-key")
     public ResponseEntity<String> PspRegistry(@RequestBody PspRegistryRequestToPsp requestBody) throws Exception{
         RestTemplate restTemplate = new RestTemplate();
-
+//        System.out.println("Entered into PspRegistryController : "+requestBody.getPspCode());
         PublicKey publicKey = pspService.loadPublicKey();
         String publicKeyBase64 = pspService.publicKeyToBase64(publicKey);
         PspPublicKeyRequestToNpci request = new PspPublicKeyRequestToNpci();

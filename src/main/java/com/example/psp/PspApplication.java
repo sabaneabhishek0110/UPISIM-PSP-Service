@@ -14,9 +14,4 @@ public class PspApplication {
         SpringApplication.run(PspApplication.class, args);
     }
 
-
-//    @GetMapping("/health")
-//    public String hello() {
-//        return "Hello from PSP Service!";
-//    }
 }

@@ -13,8 +13,8 @@ public class PaymentResponse {
     private String payer_vpa;
     private String payee_vpa;
     private Double amount;
-    private String psp_txn_id;
-    private String upi_txn_id;
+    private String pspTxnId;
+    private String upiTxnId;
     private String rrn;
     private String status;
     private String response_code;

@@ -30,7 +30,7 @@ public class TokenService {
         return Jwts.builder()
                 .setId(UUID.randomUUID().toString())
                 .setSubject(userId)
-                .setIssuer("auth-service")
+                .setIssuer("psp-service")
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(exp))
                 .claim("scope", "openid")

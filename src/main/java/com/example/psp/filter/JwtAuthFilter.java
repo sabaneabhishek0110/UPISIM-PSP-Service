@@ -37,7 +37,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (path.startsWith("/api/user/login") ||
                 path.startsWith("/api/user/register") ||
-                path.startsWith("/health")) {
+                path.startsWith("/health") ||
+                path.startsWith("/internal/psp/npci/register-public-key")) {
 
             filterChain.doFilter(request, response);
             System.out.println("Passed through filter : "+path);

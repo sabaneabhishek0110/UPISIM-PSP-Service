@@ -34,11 +34,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf ->csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurer()))
+//                .cors(cors -> cors.configurationSource(corsConfig.corsConfigurer()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/user/register",
                                 "/api/user/login",
-                                "/health")
+                                "/health",
+                                "/internal/psp/npci/register-public-key")
                         .permitAll() // public endpoints
                         .anyRequest().authenticated() // protect all other endpoints
                 )

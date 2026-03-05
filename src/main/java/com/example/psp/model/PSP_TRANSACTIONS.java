@@ -27,7 +27,7 @@ public class PSP_TRANSACTIONS {
     private String payee_vpa;
 
     @Column(name = "upi_txn_id",nullable = true)
-    private String upi_txn_id;
+    private String upiTxnId;
 
     @Column(name = "rrn",nullable = true)
     private String rrn;
