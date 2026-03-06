@@ -27,8 +27,8 @@ public class AccountController {
     private final PSPService pspService;
     private final PaymentService paymentService;
     private final ObjectMapper objectMapper;
-    private RestTemplate restTemplate;
-    private PspTransactionsRepository pspTxnRepo;
+    private final RestTemplate restTemplate;
+    private final PspTransactionsRepository pspTxnRepo;
 
     @Value("${url.npci_url}")
     private String NPCI_URL;
@@ -59,9 +59,9 @@ public class AccountController {
 
             HttpEntity<BalanceRequest> entity = new HttpEntity<>(request,headers);
 
-            System.out.println("Sending to npci");
-
+            System.out.println("Sending to npci....");
             String url = NPCI_URL + "/api/account/balance";
+            System.out.println("Check Balance Url : "+url);
             BalanceResponse response = restTemplate.postForObject(
                     url,
                     entity,
@@ -76,6 +76,8 @@ public class AccountController {
             }
         }
         catch(Exception e){
+            System.out.println("Balance check failed from npci");
+            System.out.println("Error : "+e);
             return ResponseEntity.internalServerError().body("Failed to fetch balance");
         }
     }

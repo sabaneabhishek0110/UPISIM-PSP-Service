@@ -15,6 +15,7 @@ public class CallbackRequest {
     private String upiTxnId;
     private String rrn;
     private Double amount;
-    private String status;   // SUCCESS / FAILED
-    private String reason;   // only if failed
+    private String status;
+    private String responseCode;
+    private String failureReason;
 }

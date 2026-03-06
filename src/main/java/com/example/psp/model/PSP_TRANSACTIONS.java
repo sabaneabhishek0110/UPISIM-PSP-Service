@@ -40,7 +40,7 @@ public class PSP_TRANSACTIONS {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TransactionStatus status=TransactionStatus.PENDING;  // SUCCESS / FAILED / PENDING / REVERSED
+    private TransactionStatus status=TransactionStatus.PROCESSING;  // SUCCESS / FAILED / PENDING / PROCESSING / REVERSED
 
     @Column(name = "failure_reason")
     private String failure_reason; // if status is FAILED, reason for failure
@@ -63,7 +63,7 @@ public class PSP_TRANSACTIONS {
     }
 
     public enum TransactionStatus {
-        SUCCESS, FAILED, PENDING, REVERSED
+        SUCCESS, FAILED, PENDING, PROCESSING, REVERSED, CREDIT_SUCCESS
     }
 
 }

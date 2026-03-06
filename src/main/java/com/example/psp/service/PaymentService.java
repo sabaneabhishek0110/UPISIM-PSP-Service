@@ -46,11 +46,33 @@ public class PaymentService {
                 pspTransactionsRepository.findById(UUID.fromString(request.getPspTxnId()))
                         .orElseThrow();
 
-        if(txn.getStatus().equals("SUCCESS")) {
-            return; // idempotent
+        // Idempotent: don't overwrite a final state
+        if (txn.getStatus() == PSP_TRANSACTIONS.TransactionStatus.SUCCESS
+                || txn.getStatus() == PSP_TRANSACTIONS.TransactionStatus.FAILED
+                || txn.getStatus() == PSP_TRANSACTIONS.TransactionStatus.REVERSED) {
+            return;
         }
 
-        txn.setStatus(PSP_TRANSACTIONS.TransactionStatus.valueOf(request.getStatus()));
+        // Map callback status to transaction status
+        String callbackStatus = request.getStatus();
+        PSP_TRANSACTIONS.TransactionStatus newStatus;
+        switch (callbackStatus) {
+            case "SUCCESS" -> newStatus = PSP_TRANSACTIONS.TransactionStatus.SUCCESS;
+            case "FAILED" -> newStatus = PSP_TRANSACTIONS.TransactionStatus.FAILED;
+            case "REVERSED" -> newStatus = PSP_TRANSACTIONS.TransactionStatus.REVERSED;
+            default -> newStatus = PSP_TRANSACTIONS.TransactionStatus.FAILED;
+        }
+
+        txn.setStatus(newStatus);
+        if (request.getUpiTxnId() != null) {
+            txn.setUpiTxnId(request.getUpiTxnId());
+        }
+        if (request.getRrn() != null) {
+            txn.setRrn(request.getRrn());
+        }
+        if (request.getFailureReason() != null) {
+            txn.setFailure_reason(request.getFailureReason());
+        }
         txn.setUpdatedAt(LocalDateTime.now());
 
         pspTransactionsRepository.save(txn);

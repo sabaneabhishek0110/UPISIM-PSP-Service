@@ -39,7 +39,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/user/register",
                                 "/api/user/login",
                                 "/health",
-                                "/internal/psp/npci/register-public-key")
+                                "/internal/psp/npci/register-public-key",
+                                "/api/payment/callback")
                         .permitAll() // public endpoints
                         .anyRequest().authenticated() // protect all other endpoints
                 )
